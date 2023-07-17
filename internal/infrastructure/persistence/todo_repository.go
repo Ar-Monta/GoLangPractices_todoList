@@ -44,7 +44,7 @@ func (r *TodoRepository) GetAll() ([]*domain.Todo, error) {
 	todos := []*domain.Todo{}
 	for rows.Next() {
 		todo := &domain.Todo{}
-		err := rows.Scan(&todo.ID, &todo.Title, &todo.Completed, &todo.Description)
+		err := rows.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.Completed)
 		if err != nil {
 			return nil, err
 		}
