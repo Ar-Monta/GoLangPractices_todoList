@@ -118,3 +118,13 @@ The following API endpoints are available for interacting with the Todo App:
 ## Contributing
 Contributions are welcome! If you find any bugs or want to add new features, please feel free to open an issue or submit a pull request.
 
+## Generate mocks using mockery
+```bash
+./bin/mockery --name InterfaceName
+```
+
+For example
+
+```bash
+./bin/mockery --name TodoRepository
+```
