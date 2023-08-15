@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"log"
@@ -11,7 +12,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func MigrateDB(db *sql.DB) {
+func MigrateDB(db *sql.DB) error {
 	driver, err := mysql.WithInstance(db, &mysql.Config{})
 	if err != nil {
 		log.Fatal("Failed to initialize database driver:", err)
@@ -25,9 +26,11 @@ func MigrateDB(db *sql.DB) {
 	}
 
 	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange {
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		log.Fatal("Failed to apply migrations:", err)
+		return err
 	}
 
 	fmt.Println("Database migration successful")
+	return nil
 }
