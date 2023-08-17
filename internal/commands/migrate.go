@@ -1,16 +1,37 @@
-package migrations
+package commands
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/golang-migrate/migrate/v4"
-	"log"
-
+	"github.com/ArMo-Team/GoLangPractices_todoList/internal/database"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"log"
 )
+
+type MigrateCommand struct{}
+
+func (c *MigrateCommand) Execute() {
+	// Connect to the database
+	db := database.Connect()
+
+	// Run the migrations
+	err := MigrateDB(db)
+	if err != nil {
+		return
+	}
+
+	// Close the database
+	closeErr := db.Close()
+	if closeErr != nil {
+		return
+	}
+
+	fmt.Println("All migrations completed successfully.")
+}
 
 func MigrateDB(db *sql.DB) error {
 	driver, err := mysql.WithInstance(db, &mysql.Config{})
@@ -19,7 +40,7 @@ func MigrateDB(db *sql.DB) error {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://migrations",
+		"file://internal/migrations",
 		"mysql", driver)
 	if err != nil {
 		log.Fatal("Failed to initialize migration:", err)
@@ -31,6 +52,5 @@ func MigrateDB(db *sql.DB) error {
 		return err
 	}
 
-	fmt.Println("Database migration successful")
 	return nil
 }

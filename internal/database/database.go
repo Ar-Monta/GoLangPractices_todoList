@@ -30,12 +30,6 @@ func Connect() *sql.DB {
 	if err != nil {
 		log.Fatal("Failed to connect to the database:", err)
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatal("Failed to close database connection:", err)
-		}
-	}(db)
 
 	fmt.Println("Pinging connection to database")
 	err = db.Ping()
@@ -87,6 +81,15 @@ func WithDB(tasks ...func(*sql.DB) error) error {
 	closeErr := db.Close()
 	if closeErr != nil {
 		return fmt.Errorf("failed to close database connection: %w", closeErr)
+	}
+
+	return nil
+}
+
+func Close(db *sql.DB) error {
+	err := db.Close()
+	if err != nil {
+		return fmt.Errorf("failed to close database connection: %w", err)
 	}
 
 	return nil

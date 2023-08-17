@@ -122,7 +122,10 @@ func (h *TodoHandler) CreateTodoHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusCreated)
 
 	// Write the JSON response
-	w.Write(todoJSON)
+	_, err = w.Write(todoJSON)
+	if err != nil {
+		return
+	}
 }
 
 func (h *TodoHandler) UpdateTodoCompletedHandler(w http.ResponseWriter, r *http.Request) {
