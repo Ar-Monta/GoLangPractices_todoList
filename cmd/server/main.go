@@ -1,51 +1,31 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-	"github.com/joho/godotenv"
-	"log"
-	"net/http"
+	"github.com/ArMo-Team/GoLangPractices_todoList/internal/commands"
 	"os"
-
-	"github.com/ArMo-Team/GoLangPractices_todoList/internal/app/todo"
-	"github.com/ArMo-Team/GoLangPractices_todoList/internal/infrastructure/persistence"
-	"github.com/ArMo-Team/GoLangPractices_todoList/migrations"
-	"github.com/ArMo-Team/GoLangPractices_todoList/pkg/api"
 )
 
 func main() {
-	// Load variables from .env file into environment variables
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file:", err)
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: migrate | start")
+		os.Exit(1)
 	}
 
-	// Access environment variables
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbUser := os.Getenv("DB_USER")
-	// You can add password here by using /* dbPassword := os.Getenv("DB_PASSWORD") */
+	commandName := os.Args[1]
 
-	// Open connection to database
-	db, err := sql.Open("mysql", dbUser+"@tcp("+dbHost+":"+dbPort+")/"+os.Getenv("DB_NAME"))
-	if err != nil {
-		log.Fatal("Failed to connect to the database:", err)
-	}
-	defer db.Close()
+	var command commands.Command
 
-	err = db.Ping()
-	if err != nil {
-		log.Fatal("Failed to ping the database:", err)
+	switch commandName {
+	case "migrate":
+		command = &commands.MigrateCommand{}
+	case "start":
+		command = &commands.StartCommand{}
+
+	default:
+		fmt.Printf("Unknown command: %s\n", commandName)
+		os.Exit(1)
 	}
 
-	migrations.MigrateDB(db)
-
-	todoRepository := persistence.NewTodoRepository(db)
-	todoService := todo.NewTodoService(todoRepository)
-	todoHandler := &todo.TodoHandler{Service: todoService}
-	router := api.Router{TodoHandler: todoHandler}
-	http.Handle("/", router.SetupRoutes())
-
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	command.Execute()
 }
