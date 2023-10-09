@@ -228,8 +228,17 @@ The following API endpoints are available for interacting with the Todo App:
 
 - Status Code: 404 (Not Found) - if the todo item is not found.
 
-  
+
+## Generate mocks using mockery
+```bash
+./bin/mockery --name InterfaceName
+```
+
+For example:
+
+```bash
+./bin/mockery --name TodoRepository
+```
 
 ## Contributing
-
 Contributions are welcome! If you find any bugs or want to add new features, please feel free to open an issue or submit a pull request.
